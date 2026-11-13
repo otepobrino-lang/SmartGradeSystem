@@ -1,6 +1,7 @@
 
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -72,7 +73,7 @@ async function getAdminClient() {
 
 function isErrorResult(
   result: Awaited<ReturnType<typeof getAdminClient>>
-): result is { error: string; status: number } {
+): result is Extract<Awaited<ReturnType<typeof getAdminClient>>, { error: string }> {
   return "error" in result;
 }
 
@@ -122,7 +123,7 @@ function validate(
 }
 
 async function validateDepartment(
-  admin: ReturnType<typeof createClient>,
+  admin: SupabaseClient<any, "public", "public", any, any>,
   departmentId: string
 ) {
   if (!departmentId) return { data: null, error: null };

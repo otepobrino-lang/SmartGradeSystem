@@ -82,7 +82,7 @@ async function authorizeAdmin() {
 
 function isAuthorizationError(
   result: Awaited<ReturnType<typeof authorizeAdmin>>
-): result is { error: string; status: number } {
+): result is Extract<Awaited<ReturnType<typeof authorizeAdmin>>, { error: string }> {
   return "error" in result;
 }
 

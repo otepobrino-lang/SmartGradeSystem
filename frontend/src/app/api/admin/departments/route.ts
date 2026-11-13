@@ -89,7 +89,7 @@ async function getAdminClient() {
 
 function isErrorResult(
   result: Awaited<ReturnType<typeof getAdminClient>>
-): result is { error: string; status: number } {
+): result is Extract<Awaited<ReturnType<typeof getAdminClient>>, { error: string }> {
   return "error" in result;
 }
 

@@ -1,6 +1,7 @@
 
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -83,7 +84,7 @@ async function authorizeAdmin() {
 
 function isAuthorizationError(
   result: Awaited<ReturnType<typeof authorizeAdmin>>
-): result is { error: string; status: number } {
+): result is Extract<Awaited<ReturnType<typeof authorizeAdmin>>, { error: string }> {
   return "error" in result;
 }
 
@@ -162,7 +163,7 @@ function parseClassBody(body: Record<string, unknown>) {
 }
 
 async function validateAssignments(
-  admin: Awaited<ReturnType<typeof createClient>>,
+  admin: SupabaseClient<any, "public", "public", any, any>,
   values: {
     course_id: string;
     term_id: string;
