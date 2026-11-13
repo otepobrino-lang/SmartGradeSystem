@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [message, setMessage] = useState("Verifying your invitation...");
@@ -43,7 +43,7 @@ export default function AuthCallbackPage() {
           });
 
           if (error) {
-            throw new Error("We couldn't verify this invitation. The link may have expired; ask your administrator for a new one.");
+            throw new Error("We couldn't verify this invitation. The link may have expired; ask your administrator to send a new one.");
           }
 
           if (tokenType && tokenType !== "invite" && tokenType !== "recovery" && tokenType !== "signup" && tokenType !== "magiclink" && tokenType !== "email") {
@@ -64,7 +64,7 @@ export default function AuthCallbackPage() {
         if (code) {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
-            throw new Error("We couldn't verify this invitation. The link may have expired; ask your administrator for a new one.");
+            throw new Error("We couldn't verify this invitation. The link may have expired; ask your administrator to send a new one.");
           }
 
           if (!cancelled) router.replace(next);
@@ -107,5 +107,28 @@ export default function AuthCallbackPage() {
         </p>
       </section>
     </main>
+  );
+}
+
+function AuthCallbackFallback() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-5">
+      <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+        <h1 className="text-xl font-semibold text-slate-900">
+          SmartGrade account verification
+        </h1>
+        <p className="mt-3 text-sm leading-6 text-slate-600" role="status">
+          Preparing your verification...
+        </p>
+      </section>
+    </main>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={<AuthCallbackFallback />}>
+      <AuthCallbackContent />
+    </Suspense>
   );
 }
